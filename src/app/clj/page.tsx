@@ -51,7 +51,7 @@ const TablePage = () => {
         setShowModal(true)
       }else{
         console.log(data);
-        //setData(data.data)
+        setData(data.data)
       }
       
     })

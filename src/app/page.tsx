@@ -16,7 +16,7 @@ export default function Home() {
     setEmail(event.target.value);
   };
 
-  const apiUrl = 'http://192.168.46.190:8081';
+  const apiUrl = 'http://42.194.238.80:8081';
   const handleLoginClick = () => {
     // 构造要传递的数据
     const data = {
