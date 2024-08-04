@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation'
 import {hex_md5} from '../../md5';
+
 export default function Home() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -45,7 +46,7 @@ export default function Home() {
     .then(data => {
       console.log(data);
       if(data.success==true){
-        router.push('/r21');
+        router.push('/clj');
       }else{
         setShowModal(true)
       }
@@ -61,7 +62,10 @@ export default function Home() {
 
 
   return (
+    <div>
+    
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
+          
       <div className="z-10 max-w-5xl w-full font-mono text-sm">
       <label id="email" className="mb-2 block text-sm text-gray-700">UserName</label>
       <input
@@ -112,5 +116,6 @@ export default function Home() {
       )}
 
     </main>
+    </div>
   )
 }
