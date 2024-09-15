@@ -16,6 +16,10 @@ interface NodeDTO {
   weight: number;  // 实时重量
   defaultWeight: number;  // 实时重量
   updateTime: string;  // 使用字符串来表示日期时间
+  last7True: number[];
+  last7False: number[];
+  last7Warn: number[];
+  last7Box: number[];
 }
 
 // const apiUrl = 'http://42.194.238.80:8081';
@@ -23,6 +27,7 @@ const apiUrl = 'http://127.0.0.1:8081';
 const TablePage = () => {
   const router = useRouter();
   const [data, setData] = useState<NodeDTO[]>([]); // 存放记录的状态
+  const [weekData, setWeekData] = useState<NodeDTO[]>([]); // 存放记录的状态
   const [isEditing, setIsEditing] = useState(false); // 用于标记是否正在编辑记录
   
   const [selectedData, setSelectedData] = useState<NodeDTO | null>(null); // 存放正在编辑的记录
@@ -33,6 +38,7 @@ const TablePage = () => {
   useEffect(() => {
     // 在组件加载时获取数据的逻辑，你可以使用自己的 API 调用
     fetchData();
+    fetchWeekData();
   }, []);
   const updateEditedData = (data: Partial<NodeDTO>) => {
     setEditedData((prevData) => ({ ...prevData, ...data } as NodeDTO | null));
@@ -61,6 +67,36 @@ const TablePage = () => {
       }else{
         console.log("发送请求，获得的数据是：" + JSON.stringify(data, null, 2));
         setData(data)
+      }
+      
+    })
+    .catch(error => {
+      console.error('An error occurred:', error);
+    });
+    
+  };
+  const fetchWeekData = async () => {
+    const token = localStorage.getItem('token');
+    const requestBody = {
+      // Add key-value pairs as needed
+      key1: "value1"
+  };
+    fetch(apiUrl+'/send/queryNodeInfoWeek', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `${token}`,
+      },
+      credentials: 'include',
+      body: JSON.stringify(requestBody)
+    })
+    .then(response => response.json())
+    .then(data => {
+      if(data.success==false){
+        console.log("上周数据读取失败");
+      }else{
+        console.log("上周数据读取成功，获得的数据是：" + JSON.stringify(data, null, 2));
+        setWeekData(data)
       }
       
     })
