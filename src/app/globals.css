@@ -18,10 +18,35 @@
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  background-color: rgb(var(--background-start-rgb)); /* 修改为纯色背景 */
+}
+
+
+body {
+  background-color: #2c3e50; /* 暗色背景 */
+  color: #ecf0f1; /* 文字颜色 */
+  font-family: Arial, sans-serif;
+}
+
+.container {
+  padding: 20px;
+}
+
+.title {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 列 */
+  gap: 20px; /* 网格间距 */
+}
+
+.chart {
+  background-color: #34495e; /* 深色图表背景 */
+  border: 1px solid #7f8c8d; /* 边框颜色 */
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 阴影效果 */
 }
