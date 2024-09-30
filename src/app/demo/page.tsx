@@ -47,7 +47,7 @@ const render15DaysData = (record) => {
     const date = new Date(today);
     date.setDate(today.getDate() - i - 1);
     return date.toLocaleDateString();
-  }).reverse();
+  });
 
   // 计算加和
   const sumTrue = record.last7True.reduce((acc, val) => acc + val, 0);
@@ -87,7 +87,13 @@ const render15DaysData = (record) => {
                 <td>{record.last7False[index] || 0}</td>
                 <td>{record.last7Warn[index] || 0}</td>
                 <td>{record.last7Box[index] || 0}</td>
-                <td>{((record.last7Warn[index] / record.last7Box[index]) * 100).toFixed(2) || 0} {'%'}</td>
+                <td>
+                  {
+                    isNaN(record.last7Warn[index]) || isNaN(record.last7Box[index]) || !isFinite((record.last7Warn[index] / record.last7Box[index]) * 100)
+                      ? 0
+                      : ((record.last7Warn[index] / record.last7Box[index]) * 100).toFixed(2)
+                  } %
+                </td>
               </tr>
             ))}
           </tbody>
