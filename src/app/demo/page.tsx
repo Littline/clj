@@ -77,7 +77,13 @@ const render15DaysData = (record) => {
               <td>{sumFalse}</td>
               <td>{sumWarn}</td>
               <td>{sumBox}</td>
-              <td>{((sumWarn / sumBox) * 100).toFixed(2)}%</td>
+              <td>
+                {
+                isNaN(sumWarn) || isNaN(sumBox) || !isFinite((sumWarn / sumBox) * 100)
+                  ? 0
+                  : ((sumWarn / sumBox) * 100).toFixed(2)
+                } %
+              </td>
             </tr>
 
             {dateArray.map((date, index) => (
