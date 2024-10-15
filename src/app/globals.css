@@ -50,3 +50,13 @@ body {
   padding: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 阴影效果 */
 }
+
+.message-log {
+  height: 270px; /* 固定消息记录的高度 */
+  overflow-y: auto; /* 当消息超过高度时，启用滚动条 */
+}
+
+.response-data {
+  height: 100px; /* 固定返回结果区域的高度 */
+  overflow-y: auto; /* 启用滚动条 */
+}
