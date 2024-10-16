@@ -172,12 +172,12 @@ export default function Home() {
         </div>
         {/* 这里可以添加更多的图表 */}
         <div className="chart">图表 3</div>
-        <div className="chart">图表 4</div>
+        {/* <div className="chart">图表 4</div>
         <div className="chart">图表 5</div>
         <div className="chart">图表 6</div>
         <div className="chart">图表 7</div>
         <div className="chart">图表 8</div>
-        <div className="chart">图表 9</div>
+        <div className="chart">图表 9</div> */}
       </div>
 
       {/* 显示最新的十条消息 */}
@@ -190,18 +190,26 @@ export default function Home() {
         </ul>
       </div>
       <div className="container">
-        {/* 用户输入表单 */}
-        <form onSubmit={handleSubmit} className="input-form">
-          <label htmlFor="input">输入数据：</label>
-          <input
-            type="text"
+        <form onSubmit={handleSubmit} id="input-form" className="input-form">
+          <label htmlFor="input">输入二维数组：（如 [[1,2,3,3,2,1],[1,2,3,4,5,6],[-500,-174,-80,0.25,-0.1,-0.15]]）</label>
+          <textarea
             id="input"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            style={{ color: 'black' }}
+            rows={5}
+            cols={30}
+            style={{
+              color: 'black',
+              width: '100%',
+              height: '80px',
+              fontFamily: 'monospace',
+            }}
           />
-          <button type="submit">提交</button>
         </form>
+
+        {/* 提交按钮放在表单外部，并使用 form 属性绑定表单 */}
+        <button type="submit" form="input-form" style={{ marginTop: '10px' }}>提交</button>
+
 
         {/* 展示加载提示 */}
         {loading && (
