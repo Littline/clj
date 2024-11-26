@@ -1,6 +1,7 @@
 'use client'
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Modal from 'react-modal';
 
 const apiUrl = 'http://127.0.0.1:8081';
 // const apiUrl = 'http://42.194.238.80:8081';
@@ -66,7 +67,7 @@ const render15DaysData = (record) => {
               <th>报警</th>
               <th>故障</th>
               <th>箱量</th>
-              <th>误报率</th>
+              <th>报警率</th>
             </tr>
           </thead>
           <tbody>
@@ -79,9 +80,9 @@ const render15DaysData = (record) => {
               <td>{sumBox}</td>
               <td>
                 {
-                isNaN(sumWarn) || isNaN(sumBox) || !isFinite((sumWarn / sumBox) * 100)
+                isNaN(sumFalse) || isNaN(sumBox) || !isFinite((sumFalse / sumBox) * 100)
                   ? 0
-                  : ((sumWarn / sumBox) * 100).toFixed(2)
+                  : ((sumFalse / sumBox) * 100).toFixed(2)
                 } %
               </td>
             </tr>
@@ -95,9 +96,9 @@ const render15DaysData = (record) => {
                 <td>{record.last7Box[index] || 0}</td>
                 <td>
                   {
-                    isNaN(record.last7Warn[index]) || isNaN(record.last7Box[index]) || !isFinite((record.last7Warn[index] / record.last7Box[index]) * 100)
+                    isNaN(record.last7False[index]) || isNaN(record.last7Box[index]) || !isFinite((record.last7False[index] / record.last7Box[index]) * 100)
                       ? 0
-                      : ((record.last7Warn[index] / record.last7Box[index]) * 100).toFixed(2)
+                      : ((record.last7False[index] / record.last7Box[index]) * 100).toFixed(2)
                   } %
                 </td>
               </tr>
@@ -159,6 +160,9 @@ const renderCombinedChart = (record) => {
 
 const TablePage = () => {
   const [data, setData] = useState<NodeDTO[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalData, setModalData] = useState<any>(null);
+
 
   useEffect(() => {
     fetchData();
@@ -180,9 +184,70 @@ const TablePage = () => {
       .catch(error => console.error('An error occurred:', error));
   };
 
+  const openModal = async () => {
+    // 发送请求获取弹出框数据
+    const token = localStorage.getItem('token');
+    try {
+      const response = await fetch(apiUrl + '/query/queryOfflineNode', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `${token}`,
+        },
+        credentials: 'include',
+        body: JSON.stringify({ key1: "val1" }) // 根据需要传递参数
+      });
+
+      // 检查响应是否成功
+      if (response.ok) {
+        const data = await response.json();
+        setModalData(data); // 设置弹出框数据
+        setIsModalOpen(true); // 打开弹出框
+      } else {
+        console.error('请求失败:', response.statusText);
+      }
+    } catch (error) {
+      console.error('请求发生错误:', error);
+    }
+  };
+  const closeModal = () => {
+    setIsModalOpen(false); // 关闭弹出框
+    setModalData(null);
+  };
+
   return (
     <div>
-      <h1>测力佳监控管理系统</h1>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+        <h1 style={{ flex: 1, textAlign: 'center', fontSize: '30px', margin: 0 }}>测力佳监控管理系统</h1>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <button 
+            onClick={() => openModal()} 
+            style={{ 
+              padding: '10px 20px', 
+              backgroundColor: '#555', 
+              color: '#fff', 
+              border: 'none', 
+              borderRadius: '5px', 
+              cursor: 'pointer' 
+            }}
+          >
+            查看离线工控机列表
+          </button>
+          <button 
+            //onClick
+            style={{ 
+              padding: '10px 20px', 
+              backgroundColor: '#f44336', 
+              color: '#fff', 
+              border: 'none', 
+              borderRadius: '5px', 
+              cursor: 'pointer' 
+            }}
+          >
+            退出登录
+          </button>
+        </div>
+      </div>
       <table style={{ width: '100%', borderCollapse: 'collapse' }}>
         <thead>
           <tr
@@ -215,7 +280,7 @@ const TablePage = () => {
                 <td>{record.number}</td>
                 <td>{record.weight}</td>
                 <td>{record.defaultWeight}</td>
-                <td>{new Date(record.updateTime).toLocaleString()}</td>
+                <td>{new Date(new Date(record.updateTime).setHours(new Date(record.updateTime).getHours() - 8)).toLocaleString()}</td>
                 {render15DaysData(record)}
                 {renderCombinedChart(record)}
               </tr>
@@ -227,6 +292,46 @@ const TablePage = () => {
           )}
         </tbody>
       </table>
+      {/* 弹出框组件 */}
+      <Modal
+        isOpen={isModalOpen}
+        onRequestClose={closeModal}
+        contentLabel="详细信息"
+        style={{
+          overlay: {
+            backgroundColor: 'rgba(0, 0, 0, 0.8)', // 背景黑色，带透明度
+          },
+          content: {
+            maxWidth: '600px',
+            margin: 'auto',
+            padding: '20px',
+            borderRadius: '10px',
+            backgroundColor: '#333', // 黑色背景
+            color: '#fff', // 白色文字
+          }
+        }}
+      >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h1>离线工控机列表</h1>
+          <button onClick={closeModal}>关闭弹窗</button>
+        </div>
+        
+        
+        {modalData ? (
+           <div>
+           {modalData.map((item: { id: number; name: string; number: string }) => (
+             <div key={item.id}>
+               <p><strong>{item.id}:</strong> {item.name}-{item.number}</p>
+             </div>
+           ))}
+         </div>
+        ) : (
+          <p>加载中...</p>
+        )}
+        
+      </Modal>
+      
+      
     </div>
   );
 };

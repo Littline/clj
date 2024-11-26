@@ -60,7 +60,7 @@ export default function Home() {
     setLoading(true);
 
     // 调用后端HTTP服务的URL
-    const url = 'http://127.0.0.1:8091/handleMessage'; // 替换为实际的后端API地址
+    const url = 'http://192.168.46.190:8091/handleMessage'; // 替换为实际的后端API地址
 
     fetch(url, {
       method: 'POST',
