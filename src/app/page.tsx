@@ -67,11 +67,11 @@ export default function Home() {
     
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
           
-      <div className="z-10 max-w-5xl w-full font-mono text-sm">
-      <label id="email" className="mb-2 block text-sm text-gray-700">UserName</label>
+      <div className="z-10 max-w-5xl w-full font-mono text-sm text-black">
+      <label id="email" className="mb-2 block text-sm text-black">UserName</label>
       <input
         id="email"
-        type="email"
+        type="text"
         name="email"
         placeholder="user name"
         className="w-full px-4 py-2 rounded-lg shadow-sm border border-gray-300 focus:border-blue-500"
@@ -80,7 +80,7 @@ export default function Home() {
       />
       <div className='p-2'></div>
       <div className='p-2'></div>
-      <label id="email" className="mb-2 block text-sm text-gray-700">Password</label>
+      <label id="email" className="mb-2 block text-sm text-black">Password</label>
         <input
         id="password"
         type="password"
