@@ -18,6 +18,7 @@ const RecordDetailPage = ({ params }: { params: { id: string } }) => {
   const [beginTime, setBeginTime] = useState<string>('');
   const [endTime, setEndTime] = useState<string>('');
   const [queryTriggered, setQueryTriggered] = useState<boolean>(false); // State to track if query is triggered
+  const [isInitialized, setIsInitialized] = useState<boolean>(false);
 
   const router = useRouter();
 
@@ -39,7 +40,13 @@ const RecordDetailPage = ({ params }: { params: { id: string } }) => {
     fetchName();
     setBeginTime(defaultBeginTime);
     setEndTime(defaultEndTime);
+    setIsInitialized(true);
   }, []);
+  useEffect(() => {
+    if (isInitialized && beginTime && endTime) {
+      fetchData();
+    }
+  }, [isInitialized, beginTime, endTime]);
 
   const fetchName = async () => {
     try {
@@ -67,6 +74,10 @@ const RecordDetailPage = ({ params }: { params: { id: string } }) => {
 
   // Function to group records by date
   const groupDataByDay = (data: any[]) => {
+    if (!Array.isArray(data)) {
+      console.error("Invalid data format:", data);
+      return {}; // 返回空的分组对象
+    }
     const grouped: { [key: string]: any[] } = {};
     data.forEach((record) => {
       const date = new Date(record.time).toLocaleDateString(); // Format as YYYY-MM-DD
