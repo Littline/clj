@@ -36,10 +36,14 @@ export default function Home() {
     })
     .then(response => {
       response.headers.forEach((v,k)=>console.log(k,v))
-      const setCookieHeaders = response.headers.get('Set-Cookie');
+      // const setCookieHeaders = response.headers.getAll('Set-Cookie');
+      // console.log('All Set-Cookie headers:', setCookieHeaders);
       const contentDisposition = response.headers.get('Content-Disposition');
-      localStorage.setItem('token', contentDisposition ? contentDisposition : '');
-  
+      localStorage.setItem('contentDisposition', contentDisposition ? contentDisposition : '');
+      console.log('contentDisposition', contentDisposition);
+      const userAccount = response.headers.get('User-Account');
+      localStorage.setItem('userAccount', userAccount ? userAccount : '');
+      console.log('userAccount', userAccount);
       //const allHeaders = new Headers(response.headers).raw();
       //console.log('All Headers:', allHeaders);
       return response.json();
@@ -47,7 +51,7 @@ export default function Home() {
     .then(data => {
       console.log(data);
       if(data.success==true){
-        router.push('/clj');
+        router.push('/demo');
       }else{
         setShowModal(true)
       }

@@ -2,8 +2,10 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Modal from 'react-modal';
+const apiIp = process.env.API_IP;
+const apiPort = process.env.API_PORT;
 
-const apiUrl = 'http://127.0.0.1:8081';
+const apiUrl = `http://${apiIp}:${apiPort}`;
 // const apiUrl = 'http://42.194.238.80:8081';
 
 interface NodeDTO {
@@ -162,31 +164,43 @@ const TablePage = () => {
   const [data, setData] = useState<NodeDTO[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalData, setModalData] = useState<any>(null);
-
+  const [showModal, setShowModal] = useState(false);//退出登录弹窗
 
   useEffect(() => {
     fetchData();
   }, []);
-
+  //get online data
   const fetchData = async () => {
-    const token = localStorage.getItem('token');
-    fetch(apiUrl + '/send/queryNodeInfoWeek', {
+    const token = localStorage.getItem('contentDisposition');
+    const account = localStorage.getItem('userAccount');
+    fetch(apiUrl + '/send/queryNodeInfoWeekToken', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `${token}`,
       },
       credentials: 'include',
-      body: JSON.stringify({ key1: "value1", key2: "value2" })
+      body: JSON.stringify({ account: account, token: token })
     })
       .then(response => response.json())
-      .then(data => setData(data))
+      .then(//data => setData(data)
+        data => {
+          console.log(data);
+          if(data.success==false){
+            setShowModal(true)
+          }else{
+            console.log(data);
+            setData(data.data)
+          }
+          
+        })
       .catch(error => console.error('An error occurred:', error));
   };
 
+  //get offline data
   const openModal = async () => {
-    // 发送请求获取弹出框数据
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('contentDisposition');
+    const account = localStorage.getItem('userAccount');
     try {
       const response = await fetch(apiUrl + '/query/queryOfflineNode', {
         method: 'POST',
@@ -195,7 +209,7 @@ const TablePage = () => {
           'Authorization': `${token}`,
         },
         credentials: 'include',
-        body: JSON.stringify({ key1: "val1" }) // 根据需要传递参数
+        body: JSON.stringify({ token: token,account:account }) // 根据需要传递参数
       });
 
       // 检查响应是否成功
@@ -213,6 +227,22 @@ const TablePage = () => {
   const closeModal = () => {
     setIsModalOpen(false); // 关闭弹出框
     setModalData(null);
+  };
+  const router = useRouter();
+
+  const handleBack = () => {
+    // 实现退出登录逻辑（如清除用户信息、token 等）
+    console.log('退出登录');
+    localStorage.clear()
+    router.push('/'); // 跳转到首页
+  };
+  const handleOnlineRowClick = (record: NodeDTO) => {
+    // 跳转到新的页面，假设目标路由为 /demo/[id]
+    router.push(`/demo/${record.id}`);
+  };
+  const handleOfflineRowClick = (id: string) => {
+    // 跳转到新的页面，假设目标路由为 /demo/[id]
+    router.push(`/demo/${id}`);
   };
 
   return (
@@ -234,7 +264,7 @@ const TablePage = () => {
             查看离线工控机列表
           </button>
           <button 
-            //onClick
+            onClick={handleBack} // 绑定退出登录逻辑
             style={{ 
               padding: '10px 20px', 
               backgroundColor: '#f44336', 
@@ -248,6 +278,25 @@ const TablePage = () => {
           </button>
         </div>
       </div>
+      {showModal && (
+        <div className="fixed inset-0 overflow-y-auto">
+          <div className="flex items-center justify-center min-h-screen">
+            <div className="fixed inset-0 transition-opacity" onClick={() => setShowModal(false)}>
+              <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+            </div>
+
+            <div className="bg-white rounded-lg p-4 max-w-sm mx-auto relative z-10">
+              <p className="text-center text-red-500 mb-4">尚未登录，请登录.</p>
+              <button
+                className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-full"
+                onClick={() => {handleBack()}}
+              >
+                关闭
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       <table style={{ width: '100%', borderCollapse: 'collapse' }}>
         <thead>
           <tr
@@ -275,8 +324,12 @@ const TablePage = () => {
           {data && data.length > 0 ? (
             data.map((record) => (
               <tr key={record.id} style={{ textAlign: 'center', borderBottom: '1px solid #ddd' }}>
-                <td>{record.id}</td>
-                <td>{record.name}</td>
+                <td><strong
+                  onClick={() => handleOnlineRowClick(record)}
+                  style={{ cursor: 'pointer' }}>{record.id}</strong></td>
+                <td><strong
+                  onClick={() => handleOnlineRowClick(record)}
+                  style={{ cursor: 'pointer' }}>{record.name}</strong></td>
                 <td>{record.number}</td>
                 <td>{record.weight}</td>
                 <td>{record.defaultWeight}</td>
@@ -321,7 +374,8 @@ const TablePage = () => {
            <div>
            {modalData.map((item: { id: number; name: string; number: string }) => (
              <div key={item.id}>
-               <p><strong>{item.id}:</strong> {item.name}-{item.number}</p>
+               <p><strong onClick={() => handleOfflineRowClick(item.id.toString())}
+               style={{ cursor: 'pointer' }}>{item.id}: {item.name}-{item.number}</strong></p>
              </div>
            ))}
          </div>
