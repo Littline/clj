@@ -42,11 +42,11 @@ const RecordDetailPage = ({ params }: { params: { id: string } }) => {
     setEndTime(defaultEndTime);
     setIsInitialized(true);
   }, []);
-  useEffect(() => {
-    if (isInitialized && beginTime && endTime) {
-      fetchData();
-    }
-  }, [isInitialized, beginTime, endTime]);
+  // useEffect(() => {
+  //   if (isInitialized && beginTime && endTime) {
+  //     fetchData();
+  //   }
+  // }, [isInitialized, beginTime, endTime]);
 
   const fetchName = async () => {
     try {
@@ -213,7 +213,8 @@ const RecordDetailPage = ({ params }: { params: { id: string } }) => {
       </div>
 
       {/* Render charts for each grouped date */}
-      {Object.keys(groupedData).length === 0 && <p>该时间段内没有找到符合条件的数据</p>}
+      {Object.keys(groupedData).length === 0 && queryTriggered && <p>该时间段内没有找到符合条件的数据</p>}
+      {Object.keys(groupedData).length === 0 && !queryTriggered && <p>加载完毕，请点击进行查询</p>}
       {Object.keys(groupedData).length !== 0 && <p>查询结果: 该时间段内共查询到{data.length}条数据</p>}
       <div><h1>&nbsp;</h1> </div>
       {Object.keys(groupedData).map((date) => {
